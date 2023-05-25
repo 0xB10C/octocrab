@@ -21,6 +21,7 @@ pub mod pulls;
 pub mod reactions;
 pub mod repos;
 pub mod teams;
+pub mod timelines;
 pub mod workflows;
 
 pub use apps::App;
@@ -119,6 +120,7 @@ id_type!(
     RunId,
     StatusId,
     TeamId,
+    TimelineEventId,
     ThreadId,
     UploaderId,
     UserId,
@@ -176,10 +178,15 @@ pub enum Event {
     AutomaticBaseChangeSucceeded,
     /// The base reference branch of the pull request changed.
     BaseRefChanged,
+    /// Not documented in the Github issue events documentation.
+    BaseRefForcePushed,
     /// The issue or pull request was closed. When the commit_id is present, it identifies the commit that closed the issue using "closes / fixes" syntax.
     Closed,
     /// A comment was added to the issue or pull request.
     Commented,
+    /// A comment that was removed from the issue or pull request.
+    /// This isn't documented as part of the issues-event-types API but returned by the API.
+    CommentDeleted,
     /// A commit was added to the pull request's HEAD branch.
     Committed,
     /// The issue or pull request was linked to another issue or pull request.
@@ -191,7 +198,7 @@ pub enum Event {
     /// The issue was closed and converted to a discussion.
     ConvertedToDiscussion,
     /// The issue or pull request was referenced from another issue or pull request.
-    #[serde(rename = "cross-refereced")]
+    #[serde(rename = "cross-referenced")]
     CrossReferenced,
     /// The issue or pull request was removed from a milestone.
     Demilestoned,
@@ -209,6 +216,9 @@ pub enum Event {
     HeadRefRestored,
     /// A label was added to the issue or pull request.
     Labeled,
+    /// A comment on a line of source in a pull request. Not documented in the issue and events documentation.
+    #[serde(rename = "line-commented")]
+    LineCommented,
     /// The issue or pull request was locked.
     Locked,
     /// The actor was @mentioned in an issue or pull request body.
@@ -311,7 +321,8 @@ pub struct ProjectCard {
     pub column_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub previous_column_name: Option<String>,
-    pub column_url: Url,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub column_url: Option<Url>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
