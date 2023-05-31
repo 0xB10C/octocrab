@@ -83,6 +83,12 @@ pub struct PullRequest {
     pub draft: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repo: Option<Box<Repository>>,
+    pub additions: u64,
+    pub deletions: u64,
+    pub changed_files: u64,
+    pub commits: u64,
+    pub review_comments: u64,
+    pub comments: u64,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
